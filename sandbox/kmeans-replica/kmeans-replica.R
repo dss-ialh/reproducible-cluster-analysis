@@ -56,6 +56,20 @@ attr(df2,"scaled:scale")
 
 # ---- basic-graph --------------------------------------------------------------
 
+g1 <- df3 %>% 
+  ggplot2::ggplot(
+    aes_string(
+      x     = "Murder"
+      ,y    = "Assault"
+      ,size = "Rape"
+      ,fill = "UrbanPop"
+    )
+  )+
+  geom_point(shape = 21, color = "black", alpha = .5)+
+  theme_bw()
+g1
+
+  
 # Sonata form report structure
 # ---- dev-a-0 ---------------------------------
 # ---- dev-a-1 ---------------------------------

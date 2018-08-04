@@ -96,12 +96,70 @@ df3 %>% make_basic_scatter("UrbanPop", "Assault", "Rape", "Murder")
 
 
 
-  
-# Sonata form report structure
 # ---- dev-a-0 ---------------------------------
+distance <- df2 %>% factoextra::get_dist()
+
+g2 <- distance %>% fviz_dist(
+  gradient = list(
+       low  = "#00AFBB"
+      ,mid  = "white"
+      ,high = "#FC4E07"
+      )
+  )
+g2 %>% print()
+
+k2 <- df2 %>% stats::kmeans(
+   centers = 2  # number of clusters to search for
+  ,nstart  = 25 # number of initial configurations to attempt
+  )
+k2 %>% print()
+
 # ---- dev-a-1 ---------------------------------
+# structcure of the estimated object
+k2 %>% str()
+
+
+k2$centers        # A matrix of cluster centers.
+k2$totss          # The total sum of squares.
+k2$withinss       # Vector of within-cluster sum of squares, one component per cluster.
+k2$tot.withinss   # Total within-cluster sum of squares, i.e. sum(withinss).
+k2$betweenss      # The between-cluster sum of squares, i.e. $totss-tot.withinss$.
+k2$size           # The number of points in each cluster.
 # ---- dev-a-2 ---------------------------------
+
+g3 <- k2 %>% factoextra::fviz_cluster(data = df2)
+g3 %>% print()
 # ---- dev-a-3 ---------------------------------
+g4 <- 
+  # data section
+  # dplyr::mutate(cluster = k2$cluster) # this is a soft join, it expects that two objects will be sorted in the same way. 
+  # This join is not desirable, as it may introduce hard-to-trace error
+  # instead, use the proper join that identifies explicitely the joining key
+  dplyr::left_join(
+    # the first  dataframe to be joined 
+     df3
+    # the second dataframe to be joined
+    ,k2$cluster %>% 
+      tibble::as_tibble() %>% 
+      tibble::rownames_to_column("State") %>% 
+      dplyr::rename("cluster" = "value")
+    # by clause
+    , by = "State"
+  ) %>% 
+  dplyr::mutate(
+    cluster_f = factor(cluster, levels = c("1","2"), labels = c("One", "Two"))
+  ) %>% 
+  # graphing section
+  ggplot2::ggplot(
+    aes_string(
+       x     = "UrbanPop"
+      ,y     = "Murder"
+      ,color = "cluster_f"
+      ,label = "State")
+    ) +
+  geom_text()+
+  theme_bw()
+g4 %>% print()
 # ---- dev-a-4 ---------------------------------
 # ---- dev-a-5 ---------------------------------
 
@@ -119,9 +177,10 @@ df3 %>% make_basic_scatter("UrbanPop", "Assault", "Rape", "Murder")
 
 
 # ---- publish ---------------------------------------
-path_report_1 <- "./reports/*/report_1.Rmd"
+path_report_1 <- "./sandbox/kmeans-replica/kmeans-replica.Rmd"
 path_report_2 <- "./reports/*/report_2.Rmd"
-allReports <- c(path_report_1,path_report_2)
+# allReports <- c(path_report_1,path_report_2)
+allReports <- c(path_report_1)
 
 pathFilesToBuild <- c(allReports)
 testit::assert("The knitr Rmd files should exist.", base::file.exists(pathFilesToBuild))
@@ -130,10 +189,10 @@ for( pathFile in pathFilesToBuild ) {
   
   rmarkdown::render(input = pathFile,
                     output_format=c(
-                      # "html_document" # set print_format <- "html" in seed-study.R
+                      "html_document" # set print_format <- "html" in seed-study.R
                       # "pdf_document"
                       # ,"md_document"
-                      "word_document" # set print_format <- "pandoc" in seed-study.R
+                      # "word_document" # set print_format <- "pandoc" in seed-study.R
                     ),
                     clean=TRUE)
 }

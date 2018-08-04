@@ -69,6 +69,33 @@ g1 <- df3 %>%
   theme_bw()
 g1
 
+
+# we can make this graph a bit easier to explore data with if we express it as a function
+make_basic_scatter <- function(d,x_,y_,size_,fill_){
+  g1 <- d %>%
+    ggplot2::ggplot(
+      aes_string(
+        x     = x_
+        ,y    = y_
+        ,size = size_
+        ,fill = fill_
+      )
+    )+
+    geom_point(shape = 21, color = "black", alpha = .5)+
+    theme_bw()
+  return(g1)
+}
+# usage
+df3 %>% make_basic_scatter("Murder", "Assault", "Rape", "UrbanPop") 
+
+# this function become useful if we want to cycle through possible combination
+df3 %>% make_basic_scatter("Murder", "Assault", "Rape", "UrbanPop") 
+df3 %>% make_basic_scatter("Assault", "Murder", "Rape", "UrbanPop") 
+df3 %>% make_basic_scatter("Rape", "Assault", "Murder", "UrbanPop") 
+df3 %>% make_basic_scatter("UrbanPop", "Assault", "Rape", "Murder") 
+
+
+
   
 # Sonata form report structure
 # ---- dev-a-0 ---------------------------------

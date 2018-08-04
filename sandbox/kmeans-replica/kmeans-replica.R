@@ -28,12 +28,31 @@ source("./scripts/common-functions.R")        # reporting functions and quick vi
 source("./scripts/graphing/graph-presets.R") # font and color conventions
 
 # ---- load-data -------------------------------------------------------------
+df0 <- datasets::USArrests
 
 # ---- inspect-data -------------------------------------------------------------
+df0 %>%  dplyr::glimpse()
+df0 %>% head()
 
 # ---- tweak-data --------------------------------------------------------------
+# remove missing values
+df1 <- df0 %>% na.omit() 
 
+# standardize variables 
+df2 <- df1 %>% 
+  base::scale() 
+
+df3 <- df2 %>% 
+  base::as.data.frame() %>% 
+  tibble::rownames_to_column("State")
 # ---- basic-table --------------------------------------------------------------
+df1 %>% head() %>% knitr::kable()
+df2 %>% head() %>% knitr::kable()
+df2 %>% head() %>% knitr::kable(digits = 2)
+df3 %>% head() %>% knitr::kable(digits = 2)
+
+attr(df2,"scaled:center")
+attr(df2,"scaled:scale")
 
 # ---- basic-graph --------------------------------------------------------------
 

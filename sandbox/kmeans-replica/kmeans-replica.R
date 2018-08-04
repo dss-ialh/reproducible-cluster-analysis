@@ -3,25 +3,21 @@
 rm(list=ls(all=TRUE)) #Clear the memory of variables from previous run. This is not called by knitr, because it's above the first chunk.
 cat("\f") # clear console 
 
-# This script reads two files: patient event table + location map. 
-rm(list=ls(all=TRUE)) #Clear the memory of variables from previous run. This is not called by knitr, because it's above the first chunk.
-
 # ---- load-packages -----------------------------------------------------------
+# library(tidyverse) avoid loading the entire tidyverse
 library(ggplot2) #For graphing
 library(magrittr) #Pipes
 library(dplyr) # for shorter function names. but still prefer dplyr:: stems
+library(rmarkdown) # dynamic documents
 library(knitr) # dynamic documents
-library(rmarkdown) # dynamic
 library(kableExtra) # enhanced tables, see http://haozhu233.github.io/kableExtra/awesome_table_in_html.html
 # library(TabularManifest) # exploratory data analysis, see https://github.com/Melinae/TabularManifest
-requireNamespace("knitr", quietly=TRUE)
+library(cluster)    # clustering algorithms
+library(factoextra) # clustering algorithms & visualization
 requireNamespace("scales", quietly=TRUE) #For formating values in graphs
 requireNamespace("RColorBrewer", quietly=TRUE)
 requireNamespace("dplyr", quietly=TRUE)
 requireNamespace("DT", quietly=TRUE) # for dynamic tables
-# requireNamespace("plyr", quietly=TRUE)
-# requireNamespace("reshape2", quietly=TRUE) #For converting wide to long
-# requireNamespace("mgcv, quietly=TRUE) #For the Generalized Additive Model that smooths the longitudinal graphs.
 
 # ---- load-sources ------------------------------------------------------------
 #Load any source files that contain/define functions, but that don't load any other types of variables

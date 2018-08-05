@@ -22,10 +22,22 @@ requireNamespace("DT", quietly=TRUE) # for dynamic tables
 # ---- load-sources ------------------------------------------------------------
 #Load any source files that contain/define functions, but that don't load any other types of variables
 #   into memory.  Avoid side effects and don't pollute the global environment.
-source("./manipulation/function-support.R")  # assisting functions for data wrangling and testing
 source("./manipulation/object-glossary.R")   # object definitions
+source("./manipulation/function-support.R")  # assisting functions for data wrangling and testing
 source("./scripts/common-functions.R")        # reporting functions and quick views
 source("./scripts/graphing/graph-presets.R") # font and color conventions
+
+# ---- declare-globals -------------------------------------------------------
+# define output format for the report
+options(
+  knitr.table.format = "html"
+  ,tibble.width = 110
+  , digits = 2
+  #   ,bootstrap_options = c("striped", "hover", "condensed","responsive")
+)
+html_flip <- TRUE  #  HTML   is the default format for printing tables
+# html_flip <- FALSE #  PANDOC is the default format for printing tables
+# must provide a value if to use basic_features() function
 
 # ---- load-data -------------------------------------------------------------
 df0 <- datasets::USArrests
@@ -45,14 +57,20 @@ df2 <- df1 %>%
 df3 <- df2 %>% 
   base::as.data.frame() %>% 
   tibble::rownames_to_column("State")
-# ---- basic-table --------------------------------------------------------------
-df1 %>% head() %>% knitr::kable()
-df2 %>% head() %>% knitr::kable()
-df2 %>% head() %>% knitr::kable(digits = 2)
-df3 %>% head() %>% knitr::kable(digits = 2)
-
+# ---- basic-table-1 --------------------------------------------------------------
+df1 %>% head() %>% neat()
+# df2 is the input into the estimation routine
+df2 %>% head() %>% neat()
+# it has some additional attributes
 attr(df2,"scaled:center")
 attr(df2,"scaled:scale")
+# ---- basic-table-2 --------------------------------------------------------------
+# df3 is a tibbled df2, pre-wrangled for easier graphing
+df3 %>% head() %>% neat(digits = 2)
+print(neat) # function to add style to tables
+print(neat_DT) # function to style dynamic tables
+df3 %>% neat_DT() # watch out for size and security
+
 
 # ---- basic-graph --------------------------------------------------------------
 
@@ -89,14 +107,15 @@ make_basic_scatter <- function(d,x_,y_,size_,fill_){
 df3 %>% make_basic_scatter("Murder", "Assault", "Rape", "UrbanPop") 
 
 # this function become useful if we want to cycle through possible combination
-df3 %>% make_basic_scatter("Murder", "Assault", "Rape", "UrbanPop") 
-df3 %>% make_basic_scatter("Assault", "Murder", "Rape", "UrbanPop") 
-df3 %>% make_basic_scatter("Rape", "Assault", "Murder", "UrbanPop") 
-df3 %>% make_basic_scatter("UrbanPop", "Assault", "Rape", "Murder") 
+df3 %>% make_basic_scatter("Rape", "UrbanPop", "Assault", "Murder") 
+# df3 %>% make_basic_scatter("Murder", "Assault", "Rape", "UrbanPop") 
+# df3 %>% make_basic_scatter("Assault", "Murder", "Rape", "UrbanPop") 
+# df3 %>% make_basic_scatter("Rape", "Assault", "Murder", "UrbanPop") 
 
 
 
-# ---- dev-a-0 ---------------------------------
+# ---- dev-a-1 ---------------------------------
+
 distance <- df2 %>% factoextra::get_dist()
 
 g2 <- distance %>% fviz_dist(
@@ -114,10 +133,8 @@ k2 <- df2 %>% stats::kmeans(
   )
 k2 %>% print()
 
-# ---- dev-a-1 ---------------------------------
 # structcure of the estimated object
 k2 %>% str()
-
 
 k2$centers        # A matrix of cluster centers.
 k2$totss          # The total sum of squares.
@@ -126,10 +143,18 @@ k2$tot.withinss   # Total within-cluster sum of squares, i.e. sum(withinss).
 k2$betweenss      # The between-cluster sum of squares, i.e. $totss-tot.withinss$.
 k2$size           # The number of points in each cluster.
 # ---- dev-a-2 ---------------------------------
-
+# factoextra() give generic tools for viewing objects produced by stats::kmeans()
 g3 <- k2 %>% factoextra::fviz_cluster(data = df2)
 g3 %>% print()
+# factoextra() is great for initial review
+# to visualize the data it retains only the first two of the eigen dimensions
+# solution to that is provided by stats::prcomp() function, selection the top two principle components
+# if we want to increase the number of dimensions or rotate the solutions
+# we should either extract the  stats::prcomp() results or replicate them.(TODO)
+
 # ---- dev-a-3 ---------------------------------
+# let us practice adding the solution of the model to the original dataframe
+# this gives us flexibility to visualize the results 
 g4 <- 
   # data section
   # dplyr::mutate(cluster = k2$cluster) # this is a soft join, it expects that two objects will be sorted in the same way. 
@@ -161,7 +186,97 @@ g4 <-
   theme_bw()
 g4 %>% print()
 # ---- dev-a-4 ---------------------------------
+# we would like to obtain solutions for a variety of n-dimensional spaces
+# let us design functions to implement computation and organize components of the workflow
+
+# the first, most outer layer of the loop will cycle through number of possible dimentions in the solution space
+ls_solutions <- list()
+for(k in 2:3){
+  # k <- 3 # for testing and development
+  n_dim <- paste0(k)
+  ls_solutions[[n_dim]][["distance"]] <- 
+    df2 %>% 
+    stats::kmeans(
+      centers = k  # number of clusters to search for
+      ,nstart  = 25 # number of initial configurations to attempt
+    )
+  ls_solutions[[n_dim]][["solution"]] <- 
+    dplyr::left_join(
+      # the first  dataframe to be joined 
+      df3
+      # the second dataframe to be joined
+      ,ls_solutions[[paste0(k)]][["distance"]][["cluster"]] %>% 
+        tibble::as_tibble() %>% 
+        tibble::rownames_to_column("State") %>% 
+        dplyr::rename("cluster" = "value")
+      # by clause
+      , by = "State"
+    ) 
+  ls_solutions[[n_dim]][["graph0"]] <-  
+    ls_solutions[[n_dim]][["distance"]] %>%  
+    factoextra::fviz_cluster(data = df2)
+}
+ls_solutions$`3`$graph0
+
 # ---- dev-a-5 ---------------------------------
+# we can package this loop in a function, so that process becomes a bit more controlled
+# it is also useful for expanding the contents of the loop
+
+conduct_kmeans_basic <- function(
+  d # missing removed, standardized
+  ,n_cluster
+){
+  # d <- df2
+  # basic pre-wrangling for solution extraction
+  d1 <- d %>% 
+    base::as.data.frame() %>% 
+    tibble::rownames_to_column("State")
+  
+  ls_sol <- list() # create a shell to popoulate
+
+  ls_sol[["distance"]] <- 
+    d %>% 
+    stats::kmeans(
+      centers = k  # number of clusters to search for
+      ,nstart  = 25 # number of initial configurations to attempt
+    )
+  ls_sol[["solution"]] <- 
+    dplyr::left_join(
+      # the first  dataframe to be joined 
+      d1
+      # the second dataframe to be joined
+      ,ls_sol[["distance"]][["cluster"]] %>% 
+        tibble::as_tibble() %>% 
+        tibble::rownames_to_column("State") %>% 
+        dplyr::rename("cluster" = "value")
+      # the by clause
+      , by = "State"
+    ) 
+  ls_sol[["graph0"]] <-  
+    ls_sol[["distance"]] %>%  
+    factoextra::fviz_cluster(data = d)
+  
+  return(ls_sol)
+}
+# usage
+# ls_sol <- df2 %>% conduct_kmeans_basic(n_cluster = 3)
+# lapply(ls_sol, names)  
+
+# ---- dev-a-6 ---------------------------------
+# now we can use this general function to populate the loop more flexibly
+ls_solutions <- list()
+for(k in 2:6){
+  ls_solutions[[paste0(k)]] <- df2 %>% conduct_kmeans_basic(n_cluster = k)
+}
+lapply(ls_solutions, names)
+ls_solutions$`3`$distance
+ls_solutions$`3`$solution %>% head(10) %>% neat()
+ls_solutions$`2`$graph0
+ls_solutions$`3`$graph0
+ls_solutions$`4`$graph0
+
+
+# now we can package routine operations into a single function
 
 # ---- dev-b-0 ---------------------------------
 # ---- dev-b-1 ---------------------------------

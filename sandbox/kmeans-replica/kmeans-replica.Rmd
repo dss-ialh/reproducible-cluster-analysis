@@ -2,9 +2,19 @@
 title: "Replicating K-Means"
 output:
   html_document:
+    df_print: kable
     keep_md: yes
+    theme: readable
     toc: yes
+    toc_float: yes
 ---
+
+This documents offers a commentary on the [K-Means Cluster Analysis][kmeans] guide by [Bradley Boehmke][boehmke]. Taking advantage of Bradley's excellent coverage of the theory, we would like to focus on syntactic and operational features of the analytic workflow. 
+
+[kmeans]:http://uc-r.github.io/kmeans_clustering
+[boehmke]:http://uc-r.github.io/
+
+
 
 <!-- These two chunks should be added in the beginning of every .Rmd that you want to source an .R script -->
 <!--  The 1st mandatory chunck  -->
@@ -43,8 +53,6 @@ read_chunk("./sandbox/kmeans-replica/kmeans-replica.R")
 ```
 
 
-
-<!-- Load 'sourced' R files.  Suppress the output when loading packages. --> 
 ```{r load-packages, echo=echoChunks, message=FALSE}
 ```
 
@@ -83,30 +91,50 @@ Review functions definitions to assist you in reading the report.
 ```{r tweak-data, echo=T, results='hide', message=FALSE, warning=F}
 ```
 
-# II. Development A
-
-```{r dev-a-0, echo=T, results='asos', message=FALSE}
+## Basic Table
+```{r basic-table-1, echo=T, results='show', message=FALSE}
 ```
 
-## A1
+```{r basic-table-2, echo=T, results='show', message=FALSE}
+```
+
+
+## Basic Graph
+```{r basic-graph, echo=T, results='show', message=FALSE}
+```
+
+# II. Development A
+
+
+First, we must produce **distance matrix**, the basis for the upcoming clustering 
+
+```{r dev-a-0, echo=T, results='show', message=FALSE}
+```
+
+## A1 - Distance
 ```{r dev-a-1, echo=T, results='show', message=FALSE}
 ```
 
-## A2
+## A2 - Cluster Scatter
 ```{r dev-a-2, echo=T, results='show', message=FALSE}
 ```
 
-## A3
+## A3 - Customized CS
 ```{r dev-a-3, echo=T, results='show', message=FALSE}
 ```
 
-## A4
+## A4 - Looping
 ```{r dev-a-4, echo=T, results='show', message=FALSE}
 ```
 
-## A5
+## A5 - Automation
 ```{r dev-a-5, echo=T, results='show', message=FALSE}
 ```
+
+## A6 - New Looping
+```{r dev-a-6, echo=T, results='show', message=FALSE}
+```
+
 
 
 
@@ -137,6 +165,8 @@ Review functions definitions to assist you in reading the report.
 
 
 # IV. Recap
+
+
 ```{r recap-0, echo=T, results='show', message=FALSE}
 ```
 
@@ -153,6 +183,12 @@ Review functions definitions to assist you in reading the report.
 ```{r xxx, echo=T, results='show', message=FALSE}
 ```
 
+
+
+```{r session-info, echo=FALSE}
+cat("Report rendered by", Sys.info()["user"], "at", strftime(Sys.time(), "%Y-%m-%d, %H:%M %z"))
+sessionInfo()
+```
 
 
 

@@ -104,7 +104,7 @@ make_basic_scatter <- function(d,x_,y_,size_,fill_){
   return(g1)
 }
 # usage
-df3 %>% make_basic_scatter("Murder", "Assault", "Rape", "UrbanPop") 
+df3 %>% make_basic_scatter("Assault", "Rape", "Murder", "UrbanPop") 
 
 # this function become useful if we want to cycle through possible combination
 df3 %>% make_basic_scatter("Rape", "UrbanPop", "Assault", "Murder") 

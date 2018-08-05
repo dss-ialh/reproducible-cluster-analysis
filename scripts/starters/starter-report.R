@@ -19,8 +19,6 @@ requireNamespace("scales", quietly=TRUE) #For formating values in graphs
 requireNamespace("RColorBrewer", quietly=TRUE)
 requireNamespace("dplyr", quietly=TRUE)
 requireNamespace("DT", quietly=TRUE) # for dynamic tables
-# requireNamespace("plyr", quietly=TRUE)
-# requireNamespace("reshape2", quietly=TRUE) #For converting wide to long
 # requireNamespace("mgcv, quietly=TRUE) #For the Generalized Additive Model that smooths the longitudinal graphs.
 
 # ---- load-sources ------------------------------------------------------------
@@ -30,6 +28,17 @@ source("./manipulation/function-support.R")  # assisting functions for data wran
 source("./manipulation/object-glossary.R")   # object definitions
 source("./scripts/common-functions.R")        # reporting functions and quick views
 source("./scripts/graphing/graph-presets.R") # font and color conventions
+
+# ---- declare-globals -------------------------------------------------------
+# define output format for the report
+options(
+  knitr.table.format = "html"
+  ,tibble.width = 110
+  #   ,bootstrap_options = c("striped", "hover", "condensed","responsive")
+)
+html_flip <- TRUE  #  HTML   is the default format for printing tables
+# html_flip <- FALSE #  PANDOC is the default format for printing tables
+# must provide a value if to use basic_features() function
 
 # ---- load-data -------------------------------------------------------------
 

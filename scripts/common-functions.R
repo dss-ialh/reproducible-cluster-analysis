@@ -16,28 +16,28 @@ names_labels <- function(ds){
 }
 # names_labels(ds=oneFile)
 
-# adds neat styling to your knitr table
-neat <- function(x, output_format = "html",...){ 
+# adds neat styling to your knitr table using knitr:: and kableExtra:: packages
+neat <- function(x, html = html_flip , ...){
+  # browser()
   # knitr.table.format = output_format
-  if(output_format == "pandoc"){
-    x_t <- knitr::kable(x, format = "pandoc",...)
+  if(!html){
+    x_t <- knitr::kable(x, format = "pandoc", row.names = T,...)
   }else{
     x_t <- x %>%
       # x %>%
       # knitr::kable() %>%
-      knitr::kable(format=output_format,...) %>%
+      knitr::kable(format="html",row.names = F, ...) %>%
       kableExtra::kable_styling(
         bootstrap_options = c("striped", "hover", "condensed","responsive"),
         # bootstrap_options = c( "condensed"),
         full_width = F,
         position = "left"
       )
-  } 
+  }
   return(x_t)
 }
-# ds %>% distinct(id) %>% count() %>% neat(10)
 
-# adds a formated datatable
+# prints data as a dynamic table of the DT:: package
 neat_DT <- function(x, filter_="top"){
   
   xt <- x %>%
@@ -52,5 +52,3 @@ neat_DT <- function(x, filter_="top"){
     )
   return(xt)
 }
-
-dt <- neat_DT

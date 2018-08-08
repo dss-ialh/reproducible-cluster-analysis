@@ -30,13 +30,14 @@ source("./scripts/graphing/graph-presets.R") # font and color conventions
 # ---- declare-globals -------------------------------------------------------
 # define output format for the report
 options(
-  knitr.table.format = "html"
+  # knitr.table.format = "html"
+  knitr.table.format = "pandoc"
   ,tibble.width = 110
-  , digits = 2
-  #   ,bootstrap_options = c("striped", "hover", "condensed","responsive")
+  ,digits = 2
+  #   ,bootstrap_options = c("striped", "hover", "condensed","responsive") # when using neat()
 )
-html_flip <- TRUE  #  HTML   is the default format for printing tables
-# html_flip <- FALSE #  PANDOC is the default format for printing tables
+# html_flip <- TRUE  #  HTML   is the default format for printing tables
+html_flip <- FALSE #  PANDOC is the default format for printing tables
 # must provide a value if to use basic_features() function
 
 # ---- load-data -------------------------------------------------------------
@@ -51,11 +52,12 @@ df0 %>% head()
 df1 <- df0 %>% na.omit() 
 
 # standardize variables 
-df2 <- df1 %>% 
-  base::scale() 
+df2 <- df1 %>% base::scale() 
 
+# pre-wrangle for easier graphing
 df3 <- df2 %>% 
-  base::as.data.frame() %>% 
+  base::as.data.frame() %>% # if omit this step rownames will be lost
+  tibble::as_tibble() %>%
   tibble::rownames_to_column("State")
 # ---- basic-table-1 --------------------------------------------------------------
 df1 %>% head() %>% neat()
@@ -66,7 +68,7 @@ attr(df2,"scaled:center")
 attr(df2,"scaled:scale")
 # ---- basic-table-2 --------------------------------------------------------------
 # df3 is a tibbled df2, pre-wrangled for easier graphing
-df3 %>% head() %>% neat(digits = 2)
+df3 %>% head() %>% neat()
 print(neat) # function to add style to tables
 print(neat_DT) # function to style dynamic tables
 df3 %>% neat_DT() # watch out for size and security

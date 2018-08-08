@@ -40,13 +40,14 @@ Review object definitions to assist you in reading the report.
 ```r
 # define output format for the report
 options(
-  knitr.table.format = "html"
+  # knitr.table.format = "html"
+  knitr.table.format = "pandoc"
   ,tibble.width = 110
-  , digits = 2
-  #   ,bootstrap_options = c("striped", "hover", "condensed","responsive")
+  ,digits = 2
+  #   ,bootstrap_options = c("striped", "hover", "condensed","responsive") # when using neat()
 )
-html_flip <- TRUE  #  HTML   is the default format for printing tables
-# html_flip <- FALSE #  PANDOC is the default format for printing tables
+# html_flip <- TRUE  #  HTML   is the default format for printing tables
+html_flip <- FALSE #  PANDOC is the default format for printing tables
 # must provide a value if to use basic_features() function
 ```
 
@@ -74,11 +75,12 @@ df0 <- datasets::USArrests
 df1 <- df0 %>% na.omit() 
 
 # standardize variables 
-df2 <- df1 %>% 
-  base::scale() 
+df2 <- df1 %>% base::scale() 
 
+# pre-wrangle for easier graphing
 df3 <- df2 %>% 
-  base::as.data.frame() %>% 
+  base::as.data.frame() %>% # if omit this step rownames will be lost
+  tibble::as_tibble() %>%
   tibble::rownames_to_column("State")
 ```
 
@@ -88,122 +90,28 @@ df3 <- df2 %>%
 df1 %>% head() %>% neat()
 ```
 
-<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; ">
- <thead>
-  <tr>
-   <th style="text-align:left;">   </th>
-   <th style="text-align:right;"> Murder </th>
-   <th style="text-align:right;"> Assault </th>
-   <th style="text-align:right;"> UrbanPop </th>
-   <th style="text-align:right;"> Rape </th>
-  </tr>
- </thead>
-<tbody>
-  <tr>
-   <td style="text-align:left;"> Alabama </td>
-   <td style="text-align:right;"> 13.2 </td>
-   <td style="text-align:right;"> 236 </td>
-   <td style="text-align:right;"> 58 </td>
-   <td style="text-align:right;"> 21 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Alaska </td>
-   <td style="text-align:right;"> 10.0 </td>
-   <td style="text-align:right;"> 263 </td>
-   <td style="text-align:right;"> 48 </td>
-   <td style="text-align:right;"> 44 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Arizona </td>
-   <td style="text-align:right;"> 8.1 </td>
-   <td style="text-align:right;"> 294 </td>
-   <td style="text-align:right;"> 80 </td>
-   <td style="text-align:right;"> 31 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Arkansas </td>
-   <td style="text-align:right;"> 8.8 </td>
-   <td style="text-align:right;"> 190 </td>
-   <td style="text-align:right;"> 50 </td>
-   <td style="text-align:right;"> 20 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> California </td>
-   <td style="text-align:right;"> 9.0 </td>
-   <td style="text-align:right;"> 276 </td>
-   <td style="text-align:right;"> 91 </td>
-   <td style="text-align:right;"> 41 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Colorado </td>
-   <td style="text-align:right;"> 7.9 </td>
-   <td style="text-align:right;"> 204 </td>
-   <td style="text-align:right;"> 78 </td>
-   <td style="text-align:right;"> 39 </td>
-  </tr>
-</tbody>
-</table>
+              Murder   Assault   UrbanPop   Rape
+-----------  -------  --------  ---------  -----
+Alabama         13.2       236         58     21
+Alaska          10.0       263         48     44
+Arizona          8.1       294         80     31
+Arkansas         8.8       190         50     20
+California       9.0       276         91     41
+Colorado         7.9       204         78     39
 
 ```r
 # df2 is the input into the estimation routine
 df2 %>% head() %>% neat()
 ```
 
-<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; ">
- <thead>
-  <tr>
-   <th style="text-align:left;">   </th>
-   <th style="text-align:right;"> Murder </th>
-   <th style="text-align:right;"> Assault </th>
-   <th style="text-align:right;"> UrbanPop </th>
-   <th style="text-align:right;"> Rape </th>
-  </tr>
- </thead>
-<tbody>
-  <tr>
-   <td style="text-align:left;"> Alabama </td>
-   <td style="text-align:right;"> 1.24 </td>
-   <td style="text-align:right;"> 0.78 </td>
-   <td style="text-align:right;"> -0.52 </td>
-   <td style="text-align:right;"> 0.00 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Alaska </td>
-   <td style="text-align:right;"> 0.51 </td>
-   <td style="text-align:right;"> 1.11 </td>
-   <td style="text-align:right;"> -1.21 </td>
-   <td style="text-align:right;"> 2.48 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Arizona </td>
-   <td style="text-align:right;"> 0.07 </td>
-   <td style="text-align:right;"> 1.48 </td>
-   <td style="text-align:right;"> 1.00 </td>
-   <td style="text-align:right;"> 1.04 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Arkansas </td>
-   <td style="text-align:right;"> 0.23 </td>
-   <td style="text-align:right;"> 0.23 </td>
-   <td style="text-align:right;"> -1.07 </td>
-   <td style="text-align:right;"> -0.18 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> California </td>
-   <td style="text-align:right;"> 0.28 </td>
-   <td style="text-align:right;"> 1.26 </td>
-   <td style="text-align:right;"> 1.76 </td>
-   <td style="text-align:right;"> 2.07 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Colorado </td>
-   <td style="text-align:right;"> 0.03 </td>
-   <td style="text-align:right;"> 0.40 </td>
-   <td style="text-align:right;"> 0.86 </td>
-   <td style="text-align:right;"> 1.86 </td>
-  </tr>
-</tbody>
-</table>
+              Murder   Assault   UrbanPop    Rape
+-----------  -------  --------  ---------  ------
+Alabama         1.24      0.78      -0.52    0.00
+Alaska          0.51      1.11      -1.21    2.48
+Arizona         0.07      1.48       1.00    1.04
+Arkansas        0.23      0.23      -1.07   -0.18
+California      0.28      1.26       1.76    2.07
+Colorado        0.03      0.40       0.86    1.86
 
 ```r
 # it has some additional attributes
@@ -227,89 +135,43 @@ attr(df2,"scaled:scale")
 
 ```r
 # df3 is a tibbled df2, pre-wrangled for easier graphing
-df3 %>% head() %>% neat(digits = 2)
+df3 %>% head() %>% neat()
 ```
 
-<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; ">
- <thead>
-  <tr>
-   <th style="text-align:left;"> State </th>
-   <th style="text-align:right;"> Murder </th>
-   <th style="text-align:right;"> Assault </th>
-   <th style="text-align:right;"> UrbanPop </th>
-   <th style="text-align:right;"> Rape </th>
-  </tr>
- </thead>
-<tbody>
-  <tr>
-   <td style="text-align:left;"> Alabama </td>
-   <td style="text-align:right;"> 1.24 </td>
-   <td style="text-align:right;"> 0.78 </td>
-   <td style="text-align:right;"> -0.52 </td>
-   <td style="text-align:right;"> 0.00 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Alaska </td>
-   <td style="text-align:right;"> 0.51 </td>
-   <td style="text-align:right;"> 1.11 </td>
-   <td style="text-align:right;"> -1.21 </td>
-   <td style="text-align:right;"> 2.48 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Arizona </td>
-   <td style="text-align:right;"> 0.07 </td>
-   <td style="text-align:right;"> 1.48 </td>
-   <td style="text-align:right;"> 1.00 </td>
-   <td style="text-align:right;"> 1.04 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Arkansas </td>
-   <td style="text-align:right;"> 0.23 </td>
-   <td style="text-align:right;"> 0.23 </td>
-   <td style="text-align:right;"> -1.07 </td>
-   <td style="text-align:right;"> -0.18 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> California </td>
-   <td style="text-align:right;"> 0.28 </td>
-   <td style="text-align:right;"> 1.26 </td>
-   <td style="text-align:right;"> 1.76 </td>
-   <td style="text-align:right;"> 2.07 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Colorado </td>
-   <td style="text-align:right;"> 0.03 </td>
-   <td style="text-align:right;"> 0.40 </td>
-   <td style="text-align:right;"> 0.86 </td>
-   <td style="text-align:right;"> 1.86 </td>
-  </tr>
-</tbody>
-</table>
+     State         Murder   Assault   UrbanPop    Rape
+---  -----------  -------  --------  ---------  ------
+1    Alabama         1.24      0.78      -0.52    0.00
+2    Alaska          0.51      1.11      -1.21    2.48
+3    Arizona         0.07      1.48       1.00    1.04
+4    Arkansas        0.23      0.23      -1.07   -0.18
+5    California      0.28      1.26       1.76    2.07
+6    Colorado        0.03      0.40       0.86    1.86
 
 ```r
 print(neat) # function to add style to tables
 ```
 
 ```
-function(x, output_format = "html",...){ 
+function(x, html = html_flip , ...){
+  # browser()
   # knitr.table.format = output_format
-  if(output_format == "pandoc"){
-    x_t <- knitr::kable(x, format = "pandoc",...)
+  if(!html){
+    x_t <- knitr::kable(x, format = "pandoc", row.names = T,...)
   }else{
     x_t <- x %>%
       # x %>%
       # knitr::kable() %>%
-      knitr::kable(format=output_format,...) %>%
+      knitr::kable(format="html",row.names = F, ...) %>%
       kableExtra::kable_styling(
         bootstrap_options = c("striped", "hover", "condensed","responsive"),
         # bootstrap_options = c( "condensed"),
         full_width = F,
         position = "left"
       )
-  } 
+  }
   return(x_t)
 }
-<bytecode: 0x1543c9b8>
+<bytecode: 0x14b91f70>
 ```
 
 ```r
@@ -337,8 +199,8 @@ function(x, filter_="top"){
 df3 %>% neat_DT() # watch out for size and security
 ```
 
-<!--html_preserve--><div id="htmlwidget-ef4d0ff2b8248cf49567" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-ef4d0ff2b8248cf49567">{"x":{"filter":"top","filterHTML":"<tr>\n  <td><\/td>\n  <td data-type=\"character\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"number\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"display: none; position: absolute; width: 200px;\">\n      <div data-min=\"-1.60440462272012\" data-max=\"2.20685993611703\" data-scale=\"15\"><\/div>\n      <span style=\"float: left;\"><\/span>\n      <span style=\"float: right;\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"number\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"display: none; position: absolute; width: 200px;\">\n      <div data-min=\"-1.50904163534684\" data-max=\"1.99477641110098\" data-scale=\"15\"><\/div>\n      <span style=\"float: left;\"><\/span>\n      <span style=\"float: right;\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"number\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"display: none; position: absolute; width: 200px;\">\n      <div data-min=\"-2.31713632003554\" data-max=\"1.75892339618678\" data-scale=\"15\"><\/div>\n      <span style=\"float: left;\"><\/span>\n      <span style=\"float: right;\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"number\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"display: none; position: absolute; width: 200px;\">\n      <div data-min=\"-1.48744693897634\" data-max=\"2.64435011373571\" data-scale=\"15\"><\/div>\n      <span style=\"float: left;\"><\/span>\n      <span style=\"float: right;\"><\/span>\n    <\/div>\n  <\/td>\n<\/tr>","data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50"],["Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"],[1.24256408388112,0.507862482177576,0.0716334061660956,0.232349381538747,0.278268231645218,0.0257145560596241,-1.03041899638922,-0.433473945005092,1.74767143505231,2.20685993611703,-0.571230495324507,-1.19113497176187,0.59970018239052,-0.135001419313027,-1.28297267197482,-0.410514519951857,0.438984207017869,1.74767143505231,-1.30593209702805,0.806335007869642,-0.77786532080363,0.990010408295529,-1.16817554670864,1.90838741042496,0.278268231645218,-0.410514519951857,-0.800824745856866,1.01296983334876,-1.30593209702805,-0.089082569206555,0.829294432922878,0.76041615776317,1.19664523377465,-1.60440462272012,-0.112041994259791,-0.272757969632442,-0.663068195537451,-0.341636244792149,-1.00745957133599,1.51807718451995,-0.915621871123045,1.24256408388112,1.12776695861494,-1.05337842144246,-1.28297267197482,0.163471106379039,-0.869703021016573,-0.479392795111564,-1.19113497176187,-0.22683911952597],[0.782839347089918,1.10682252261763,1.47880320563092,0.230868011005672,1.26281442194578,0.398859287205225,-0.729082138706061,0.806838100832712,1.97077765735819,0.482854925305002,-1.49704225847545,-0.609088369992094,0.938831246418075,-0.693084008091871,-1.37704848976148,-0.669085254349078,-0.741081515577458,0.938831246418075,-1.05306531423377,1.5507994668593,-0.261106440721591,1.01082750764645,-1.18505845981913,1.05882501513204,0.0868754885489119,-0.741081515577458,-0.825077153677234,0.974829377032265,-1.36504911289008,-0.141112672007625,1.37080881378835,0.998828130775058,1.99477641110098,-1.50904163534684,-0.609088369992094,-0.237107686978798,-0.141112672007625,-0.777079646191648,0.0388779810633253,1.29881255255997,-1.01706718361958,0.206869257262879,0.362861156591035,-0.609088369992094,-1.47304350473265,-0.177110802621815,-0.309103948207178,-1.07706406797656,-1.41304662037567,-0.117113918264831],[-0.520906614581632,-1.21176419360236,0.998980059263978,-1.07359267779822,1.75892339618678,0.860808543459832,0.791722785557759,0.446293996047393,0.998980059263978,-0.382735098777486,1.2062373329702,-0.797249646189925,1.2062373329702,-0.03730630926712,-0.589992372483706,0.0317794486349532,-0.935421161994072,0.0317794486349532,-1.00450691989614,0.100865206537026,1.34440884877434,0.584465511851539,0.0317794486349532,-1.48810722521066,0.308122480243246,-0.866335404091998,-0.24456358297334,1.06806581716605,-0.659078130385779,1.62075188038264,0.308122480243246,1.41349460667642,-1.41902146730858,-1.48810722521066,0.653551269753612,0.1699509644391,0.100865206537026,0.446293996047393,1.48258036457849,-1.21176419360236,-1.41902146730858,-0.451820856679559,0.998980059263978,0.998980059263978,-2.31713632003554,-0.175477825071266,0.515379753949466,-1.83353601472102,0.0317794486349532,-0.382735098777486],[-0.00341647301516242,2.48420294114997,1.04287838787833,-0.184916601945666,2.06782029242705,1.86496720715179,-1.0817407684258,-0.579946294323821,1.13896669142977,0.487701522914436,-0.110181254738988,-0.750769945081942,0.295524915811549,-0.0247694293599275,-1.06038781208104,-0.345063774531404,-0.526563903461908,0.103348308708663,-1.43406454811443,0.701231086362087,-0.526563903461908,1.48061399294601,-0.676034597875264,-0.441152078082847,0.743936999051617,-0.515887425289525,-0.505210947117143,2.64435011373571,-1.25256441918392,-0.259651949152344,1.16031964777454,0.519730957431583,-0.547916859806673,-1.48744693897634,0.0179364833296026,-0.131534211083753,0.861378258947825,-0.676034597875264,-1.38068215725251,0.135377743225811,-0.900240639495297,0.605142782810643,0.455672088397288,0.178083655915341,-1.07106429025342,-0.0567988638770752,0.530407435603966,-1.27391737552869,-1.11377020294295,-0.601299250668586]],"container":"<table class=\"cell-border stripe\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>State<\/th>\n      <th>Murder<\/th>\n      <th>Assault<\/th>\n      <th>UrbanPop<\/th>\n      <th>Rape<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":6,"autoWidth":false,"columnDefs":[{"className":"dt-right","targets":[2,3,4,5]},{"orderable":false,"targets":0}],"order":[],"orderClasses":false,"orderCellsTop":true,"lengthMenu":[6,10,25,50,100]}},"evals":[],"jsHooks":[]}</script><!--/html_preserve-->
+<!--html_preserve--><div id="htmlwidget-9ee4acbc85a8d2c9fa70" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-9ee4acbc85a8d2c9fa70">{"x":{"filter":"top","filterHTML":"<tr>\n  <td><\/td>\n  <td data-type=\"character\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"number\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"display: none; position: absolute; width: 200px;\">\n      <div data-min=\"-1.60440462272012\" data-max=\"2.20685993611703\" data-scale=\"15\"><\/div>\n      <span style=\"float: left;\"><\/span>\n      <span style=\"float: right;\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"number\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"display: none; position: absolute; width: 200px;\">\n      <div data-min=\"-1.50904163534684\" data-max=\"1.99477641110098\" data-scale=\"15\"><\/div>\n      <span style=\"float: left;\"><\/span>\n      <span style=\"float: right;\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"number\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"display: none; position: absolute; width: 200px;\">\n      <div data-min=\"-2.31713632003554\" data-max=\"1.75892339618678\" data-scale=\"15\"><\/div>\n      <span style=\"float: left;\"><\/span>\n      <span style=\"float: right;\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"number\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"display: none; position: absolute; width: 200px;\">\n      <div data-min=\"-1.48744693897634\" data-max=\"2.64435011373571\" data-scale=\"15\"><\/div>\n      <span style=\"float: left;\"><\/span>\n      <span style=\"float: right;\"><\/span>\n    <\/div>\n  <\/td>\n<\/tr>","data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50"],["Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"],[1.24256408388112,0.507862482177576,0.0716334061660956,0.232349381538747,0.278268231645218,0.0257145560596241,-1.03041899638922,-0.433473945005092,1.74767143505231,2.20685993611703,-0.571230495324507,-1.19113497176187,0.59970018239052,-0.135001419313027,-1.28297267197482,-0.410514519951857,0.438984207017869,1.74767143505231,-1.30593209702805,0.806335007869642,-0.77786532080363,0.990010408295529,-1.16817554670864,1.90838741042496,0.278268231645218,-0.410514519951857,-0.800824745856866,1.01296983334876,-1.30593209702805,-0.089082569206555,0.829294432922878,0.76041615776317,1.19664523377465,-1.60440462272012,-0.112041994259791,-0.272757969632442,-0.663068195537451,-0.341636244792149,-1.00745957133599,1.51807718451995,-0.915621871123045,1.24256408388112,1.12776695861494,-1.05337842144246,-1.28297267197482,0.163471106379039,-0.869703021016573,-0.479392795111564,-1.19113497176187,-0.22683911952597],[0.782839347089918,1.10682252261763,1.47880320563092,0.230868011005672,1.26281442194578,0.398859287205225,-0.729082138706061,0.806838100832712,1.97077765735819,0.482854925305002,-1.49704225847545,-0.609088369992094,0.938831246418075,-0.693084008091871,-1.37704848976148,-0.669085254349078,-0.741081515577458,0.938831246418075,-1.05306531423377,1.5507994668593,-0.261106440721591,1.01082750764645,-1.18505845981913,1.05882501513204,0.0868754885489119,-0.741081515577458,-0.825077153677234,0.974829377032265,-1.36504911289008,-0.141112672007625,1.37080881378835,0.998828130775058,1.99477641110098,-1.50904163534684,-0.609088369992094,-0.237107686978798,-0.141112672007625,-0.777079646191648,0.0388779810633253,1.29881255255997,-1.01706718361958,0.206869257262879,0.362861156591035,-0.609088369992094,-1.47304350473265,-0.177110802621815,-0.309103948207178,-1.07706406797656,-1.41304662037567,-0.117113918264831],[-0.520906614581632,-1.21176419360236,0.998980059263978,-1.07359267779822,1.75892339618678,0.860808543459832,0.791722785557759,0.446293996047393,0.998980059263978,-0.382735098777486,1.2062373329702,-0.797249646189925,1.2062373329702,-0.03730630926712,-0.589992372483706,0.0317794486349532,-0.935421161994072,0.0317794486349532,-1.00450691989614,0.100865206537026,1.34440884877434,0.584465511851539,0.0317794486349532,-1.48810722521066,0.308122480243246,-0.866335404091998,-0.24456358297334,1.06806581716605,-0.659078130385779,1.62075188038264,0.308122480243246,1.41349460667642,-1.41902146730858,-1.48810722521066,0.653551269753612,0.1699509644391,0.100865206537026,0.446293996047393,1.48258036457849,-1.21176419360236,-1.41902146730858,-0.451820856679559,0.998980059263978,0.998980059263978,-2.31713632003554,-0.175477825071266,0.515379753949466,-1.83353601472102,0.0317794486349532,-0.382735098777486],[-0.00341647301516242,2.48420294114997,1.04287838787833,-0.184916601945666,2.06782029242705,1.86496720715179,-1.0817407684258,-0.579946294323821,1.13896669142977,0.487701522914436,-0.110181254738988,-0.750769945081942,0.295524915811549,-0.0247694293599275,-1.06038781208104,-0.345063774531404,-0.526563903461908,0.103348308708663,-1.43406454811443,0.701231086362087,-0.526563903461908,1.48061399294601,-0.676034597875264,-0.441152078082847,0.743936999051617,-0.515887425289525,-0.505210947117143,2.64435011373571,-1.25256441918392,-0.259651949152344,1.16031964777454,0.519730957431583,-0.547916859806673,-1.48744693897634,0.0179364833296026,-0.131534211083753,0.861378258947825,-0.676034597875264,-1.38068215725251,0.135377743225811,-0.900240639495297,0.605142782810643,0.455672088397288,0.178083655915341,-1.07106429025342,-0.0567988638770752,0.530407435603966,-1.27391737552869,-1.11377020294295,-0.601299250668586]],"container":"<table class=\"cell-border stripe\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>State<\/th>\n      <th>Murder<\/th>\n      <th>Assault<\/th>\n      <th>UrbanPop<\/th>\n      <th>Rape<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":6,"autoWidth":false,"columnDefs":[{"className":"dt-right","targets":[2,3,4,5]},{"orderable":false,"targets":0}],"order":[],"orderClasses":false,"orderCellsTop":true,"lengthMenu":[6,10,25,50,100]}},"evals":[],"jsHooks":[]}</script><!--/html_preserve-->
 
 
 ## Basic Graph
@@ -428,31 +290,31 @@ k2 %>% print()
 ```
 
 ```
-K-means clustering with 2 clusters of sizes 30, 20
+K-means clustering with 2 clusters of sizes 20, 30
 
 Cluster means:
   Murder Assault UrbanPop  Rape
-1  -0.67   -0.68    -0.13 -0.56
-2   1.00    1.01     0.20  0.85
+1   1.00    1.01     0.20  0.85
+2  -0.67   -0.68    -0.13 -0.56
 
 Clustering vector:
        Alabama         Alaska        Arizona       Arkansas     California       Colorado    Connecticut       Delaware 
-             2              2              2              1              2              2              1              1 
+             1              1              1              2              1              1              2              2 
        Florida        Georgia         Hawaii          Idaho       Illinois        Indiana           Iowa         Kansas 
-             2              2              1              1              2              1              1              1 
+             1              1              2              2              1              2              2              2 
       Kentucky      Louisiana          Maine       Maryland  Massachusetts       Michigan      Minnesota    Mississippi 
-             1              2              1              2              1              2              1              2 
+             2              1              2              1              2              1              2              1 
       Missouri        Montana       Nebraska         Nevada  New Hampshire     New Jersey     New Mexico       New York 
-             2              1              1              2              1              1              2              2 
+             1              2              2              1              2              2              1              1 
 North Carolina   North Dakota           Ohio       Oklahoma         Oregon   Pennsylvania   Rhode Island South Carolina 
-             2              1              1              1              1              1              1              2 
+             1              2              2              2              2              2              2              1 
   South Dakota      Tennessee          Texas           Utah        Vermont       Virginia     Washington  West Virginia 
-             1              2              2              1              1              1              1              1 
+             2              1              1              2              2              2              2              2 
      Wisconsin        Wyoming 
-             1              1 
+             2              2 
 
 Within cluster sum of squares by cluster:
-[1] 56 47
+[1] 47 56
  (between_SS / total_SS =  47.5 %)
 
 Available components:
@@ -468,17 +330,17 @@ k2 %>% str()
 
 ```
 List of 9
- $ cluster     : Named int [1:50] 2 2 2 1 2 2 1 1 2 2 ...
+ $ cluster     : Named int [1:50] 1 1 1 2 1 1 2 2 1 1 ...
   ..- attr(*, "names")= chr [1:50] "Alabama" "Alaska" "Arizona" "Arkansas" ...
- $ centers     : num [1:2, 1:4] -0.67 1.005 -0.676 1.014 -0.132 ...
+ $ centers     : num [1:2, 1:4] 1.005 -0.67 1.014 -0.676 0.198 ...
   ..- attr(*, "dimnames")=List of 2
   .. ..$ : chr [1:2] "1" "2"
   .. ..$ : chr [1:4] "Murder" "Assault" "UrbanPop" "Rape"
  $ totss       : num 196
- $ withinss    : num [1:2] 56.1 46.7
+ $ withinss    : num [1:2] 46.7 56.1
  $ tot.withinss: num 103
  $ betweenss   : num 93.1
- $ size        : int [1:2] 30 20
+ $ size        : int [1:2] 20 30
  $ iter        : int 1
  $ ifault      : int 0
  - attr(*, "class")= chr "kmeans"
@@ -490,8 +352,8 @@ k2$centers        # A matrix of cluster centers.
 
 ```
   Murder Assault UrbanPop  Rape
-1  -0.67   -0.68    -0.13 -0.56
-2   1.00    1.01     0.20  0.85
+1   1.00    1.01     0.20  0.85
+2  -0.67   -0.68    -0.13 -0.56
 ```
 
 ```r
@@ -507,7 +369,7 @@ k2$withinss       # Vector of within-cluster sum of squares, one component per c
 ```
 
 ```
-[1] 56 47
+[1] 47 56
 ```
 
 ```r
@@ -531,7 +393,7 @@ k2$size           # The number of points in each cluster.
 ```
 
 ```
-[1] 30 20
+[1] 20 30
 ```
 
 ## A2 - Cluster Scatter
@@ -747,100 +609,18 @@ Available components:
 ls_solutions$`3`$solution %>% head(10) %>% neat()
 ```
 
-<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; ">
- <thead>
-  <tr>
-   <th style="text-align:left;"> State </th>
-   <th style="text-align:right;"> Murder </th>
-   <th style="text-align:right;"> Assault </th>
-   <th style="text-align:right;"> UrbanPop </th>
-   <th style="text-align:right;"> Rape </th>
-   <th style="text-align:right;"> cluster </th>
-  </tr>
- </thead>
-<tbody>
-  <tr>
-   <td style="text-align:left;"> Alabama </td>
-   <td style="text-align:right;"> 1.24 </td>
-   <td style="text-align:right;"> 0.78 </td>
-   <td style="text-align:right;"> -0.52 </td>
-   <td style="text-align:right;"> 0.00 </td>
-   <td style="text-align:right;"> 3 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Alaska </td>
-   <td style="text-align:right;"> 0.51 </td>
-   <td style="text-align:right;"> 1.11 </td>
-   <td style="text-align:right;"> -1.21 </td>
-   <td style="text-align:right;"> 2.48 </td>
-   <td style="text-align:right;"> 3 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Arizona </td>
-   <td style="text-align:right;"> 0.07 </td>
-   <td style="text-align:right;"> 1.48 </td>
-   <td style="text-align:right;"> 1.00 </td>
-   <td style="text-align:right;"> 1.04 </td>
-   <td style="text-align:right;"> 3 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Arkansas </td>
-   <td style="text-align:right;"> 0.23 </td>
-   <td style="text-align:right;"> 0.23 </td>
-   <td style="text-align:right;"> -1.07 </td>
-   <td style="text-align:right;"> -0.18 </td>
-   <td style="text-align:right;"> 2 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> California </td>
-   <td style="text-align:right;"> 0.28 </td>
-   <td style="text-align:right;"> 1.26 </td>
-   <td style="text-align:right;"> 1.76 </td>
-   <td style="text-align:right;"> 2.07 </td>
-   <td style="text-align:right;"> 3 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Colorado </td>
-   <td style="text-align:right;"> 0.03 </td>
-   <td style="text-align:right;"> 0.40 </td>
-   <td style="text-align:right;"> 0.86 </td>
-   <td style="text-align:right;"> 1.86 </td>
-   <td style="text-align:right;"> 3 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Connecticut </td>
-   <td style="text-align:right;"> -1.03 </td>
-   <td style="text-align:right;"> -0.73 </td>
-   <td style="text-align:right;"> 0.79 </td>
-   <td style="text-align:right;"> -1.08 </td>
-   <td style="text-align:right;"> 2 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Delaware </td>
-   <td style="text-align:right;"> -0.43 </td>
-   <td style="text-align:right;"> 0.81 </td>
-   <td style="text-align:right;"> 0.45 </td>
-   <td style="text-align:right;"> -0.58 </td>
-   <td style="text-align:right;"> 2 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Florida </td>
-   <td style="text-align:right;"> 1.75 </td>
-   <td style="text-align:right;"> 1.97 </td>
-   <td style="text-align:right;"> 1.00 </td>
-   <td style="text-align:right;"> 1.14 </td>
-   <td style="text-align:right;"> 3 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Georgia </td>
-   <td style="text-align:right;"> 2.21 </td>
-   <td style="text-align:right;"> 0.48 </td>
-   <td style="text-align:right;"> -0.38 </td>
-   <td style="text-align:right;"> 0.49 </td>
-   <td style="text-align:right;"> 3 </td>
-  </tr>
-</tbody>
-</table>
+     State          Murder   Assault   UrbanPop    Rape   cluster
+---  ------------  -------  --------  ---------  ------  --------
+1    Alabama          1.24      0.78      -0.52    0.00         3
+2    Alaska           0.51      1.11      -1.21    2.48         3
+3    Arizona          0.07      1.48       1.00    1.04         3
+4    Arkansas         0.23      0.23      -1.07   -0.18         2
+5    California       0.28      1.26       1.76    2.07         3
+6    Colorado         0.03      0.40       0.86    1.86         3
+7    Connecticut     -1.03     -0.73       0.79   -1.08         2
+8    Delaware        -0.43      0.81       0.45   -0.58         2
+9    Florida          1.75      1.97       1.00    1.14         3
+10   Georgia          2.21      0.48      -0.38    0.49         3
 
 ```r
 ls_solutions$`2`$graph0
@@ -905,7 +685,7 @@ ls_solutions$`4`$graph0
 
 
 ```
-Report rendered by Andriy at 2018-08-05, 12:20 -0700
+Report rendered by Andriy at 2018-08-08, 07:13 -0700
 ```
 
 ```

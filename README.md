@@ -7,7 +7,7 @@ Please see the [DSS-IALH session log][dss-log] for the larger context of the pro
 
 
 # Sandbox
-- [kmean-replica][kmeans-replica] - an applied commentary on the [K-Means Cluster Analysis][kmeans-guide-boehme] guide by [Bradley Boehmke][boehmke]. Taking advantage of Bradley's excellent coverage of the theory, we focus on syntactic and operational features of a generic analytic workflow. 
+- [kmean-replica][kmeans-replica] - an applied commentary on the [K-Means Cluster Analysis][kmeans-guide-boehme] guide by [Bradley Boehmke][boehmke]. Taking advantage of Bradley's excellent coverage of the theory, we focus on syntactic and operational features of the scripted workflow involved in a typical application of this statistical technique in data analysis. 
   - version 2018-08-05 : [html][kmeans-html-2018-08-05], [md][kmeans-md-2018-08-05]
 
 
